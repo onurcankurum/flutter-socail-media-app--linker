@@ -1,4 +1,3 @@
-import 'package:linker/UI/login/login_model_view.dart';
 import 'package:linker/UI/profile/profile_view.dart';
 import 'package:linker/services/database/database_operations.dart';
 import 'package:mobx/mobx.dart';

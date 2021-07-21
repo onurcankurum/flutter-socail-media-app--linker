@@ -16,6 +16,7 @@ class HomeModelView {
     return Container(
         margin: EdgeInsets.all(10),
         child: FloatingActionButton(
+            heroTag: "btn2",
             backgroundColor: Colors.deepOrangeAccent,
             onPressed: () {
               // Navigator.pushNamed(context, '/profile');
@@ -29,6 +30,7 @@ class HomeModelView {
     return Container(
         margin: EdgeInsets.all(10),
         child: FloatingActionButton(
+            heroTag: "btn1",
             backgroundColor: Colors.deepPurpleAccent,
             onPressed: () {
               Navigator.pushNamed(context, '/profile');

@@ -30,6 +30,7 @@ dependencies:
   firebase_analytics: ^5.0.6
   file_picker: ^3.0.1
   firebase_storage:
+  image: ^3.0.2
 
 
 
@@ -39,6 +40,10 @@ dependencies:
   cupertino_icons: ^1.0.2
   cloud_firestore: ^2.4.0
   group_button: ^3.0.0+1 #latest version
+  shared_preferences: ^2.0.6
+  image_picker: ^0.8.2
+  path_provider: ^2.0.2
+
 
 
 dev_dependencies:

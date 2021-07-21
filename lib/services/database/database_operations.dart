@@ -36,6 +36,50 @@ class DatabaseOperations {
     });
   }
 
+  static Future createUserLinkDocs(UserModel user) async {
+    await FirebaseFirestore.instance
+        .collection('users/${user.userDocId}/links')
+        .add({
+      "platform": "mail",
+      "nick": user.email,
+      "izinliler": ["genel"]
+    }).then((value) {
+      print("link klasörü oluşturuldu");
+      return true;
+    }).catchError((onError) {
+      print("link klasörü oluşturulmadı");
+      return false;
+    });
+  }
+
+  static Future createUserBiokDocs(UserModel user) async {
+    await FirebaseFirestore.instance
+        .collection('users/${user.userDocId}/profile')
+        .doc('bio')
+        .set({"bio": "rgdgdgdg"}).then((value) {
+      print("link klasörü oluşturuldu");
+      return true;
+    }).catchError((onError) {
+      print("link klasörü oluşturulmadı");
+      return false;
+    });
+  }
+
+  static Future createGroupsPath(UserModel userModel) async {
+    await FirebaseFirestore.instance
+        .collection('users/${userModel.userDocId}/topluluklar')
+        .doc('groups')
+        .set({
+      "groups": ["genel"]
+    }).then((value) {
+      print("link klasörü oluşturuldu");
+      return true;
+    }).catchError((onError) {
+      print("link klasörü oluşturulmadı");
+      return false;
+    });
+  }
+
   static getUser(String inputNick) async {
     late String email;
     await users
@@ -83,7 +127,7 @@ class DatabaseOperations {
 
   static Future<void> deleteOneLink(LinkModel link) async {
     await FirebaseFirestore.instance
-        .collection('users/${Profile.currentuser.userDocId}/links/')
+        .collection('users/${Profile.currentuser.userDocId}/links')
         .doc(link.docId)
         .delete()
         .then((val) {
@@ -112,6 +156,14 @@ class DatabaseOperations {
         .add(linkModel.toJson())
         .then((value) {
       print(value);
+    });
+  }
+
+  static Future<void> setBio(UserModel userModel, String bio) async {
+    await users
+        .doc("${userModel.userDocId}/profile/bio")
+        .set({"bio": bio}).then((val) {
+      print("no problem");
     });
   }
 }

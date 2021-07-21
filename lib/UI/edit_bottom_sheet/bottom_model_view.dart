@@ -75,26 +75,6 @@ class BottomModelView {
     );
   }
 
-  static Widget topBar() {
-    return Container(
-      width: double.infinity,
-      height: 30,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.end,
-        children: [
-          Icon(
-            Icons.save_rounded,
-            color: Colors.grey[600],
-            size: 40,
-          ),
-          SizedBox(
-            height: 10,
-          )
-        ],
-      ),
-    );
-  }
-
   static Widget saveButton(BuildContext context) {
     return ElevatedButton(
         onPressed: () async {
@@ -107,6 +87,7 @@ class BottomModelView {
                   platform: _controllerPlatform.text,
                   docId: "yeni"));
           ProfileModelView.profilModel.getLinks();
+          choosenGroups.clear();
         },
         child: Text('kaydet'));
   }

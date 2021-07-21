@@ -5,6 +5,7 @@ import 'package:linker/UI/login/login_view.dart';
 
 import 'UI/home/home_view.dart';
 import 'UI/profile/profile_view.dart';
+import 'services/database/auth.dart';
 
 void main() async {
 /*   WidgetsFlutterBinding.ensureInitialized();
@@ -13,6 +14,7 @@ void main() async {
 }
 
 class MyApp extends StatelessWidget {
+  static bool isRegister = false;
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
@@ -44,10 +46,17 @@ class MyApp extends StatelessWidget {
                         return CircularProgressIndicator();
                       }
                       if (userSnapshot.hasData) {
+                        print("alş");
+                        print(isRegister);
+                        if (isRegister) {
+                          isRegister = false;
+                          print("alş");
+                          return LoginScreen();
+                        }
                         return Home();
+                      } else {
+                        return LoginScreen();
                       }
-
-                      return LoginScreen();
                     }),
             routes: {
               // When navigating to the "/" route, build the FirstScreen widget.

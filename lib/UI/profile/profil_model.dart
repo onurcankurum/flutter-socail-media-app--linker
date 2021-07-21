@@ -14,9 +14,6 @@ part 'profil_model.g.dart';
 class ProfilModel = _ProfilModel with _$ProfilModel;
 
 abstract class _ProfilModel with Store {
-  static final ref = FirebaseStorage.instance
-      .ref()
-      .child('users/${Profile.currentuser.userDocId}.png');
   @observable
   String imageUrl = "https://image.flaticon.com/icons/png/512/1077/1077012.png";
   @observable
@@ -24,13 +21,15 @@ abstract class _ProfilModel with Store {
   @observable
   List<LinkModel> links = [];
   @action
-  Future<void> getImage() async {
-    print(ref);
-    try {
-      imageUrl = await ref.getDownloadURL();
-    } on Error {
-      print("profil resmi yüklenmedi");
-    }
+  Future<void> getImage(String id) async {
+    imageUrl = await FirebaseStorage.instance
+        .ref()
+        .child('users/${id}.png')
+        .getDownloadURL()
+        .onError((error, stackTrace) async {
+      print(await error);
+      return 'dafsdfa';
+    });
   }
 
   Future<void> myBio() async {

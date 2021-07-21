@@ -57,8 +57,8 @@ mixin _$ProfilModel on _ProfilModel, Store {
   final _$getImageAsyncAction = AsyncAction('_ProfilModel.getImage');
 
   @override
-  Future<void> getImage() {
-    return _$getImageAsyncAction.run(() => super.getImage());
+  Future<void> getImage(String id) {
+    return _$getImageAsyncAction.run(() => super.getImage(id));
   }
 
   @override

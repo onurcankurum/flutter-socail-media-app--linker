@@ -1,5 +1,6 @@
+import 'dart:ffi';
 import 'dart:io';
-
+import 'package:image_picker/image_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
@@ -12,12 +13,21 @@ import 'package:linker/UI/profile/profile_view.dart';
 import 'package:linker/core/link_model.dart';
 import 'package:linker/services/database/database_operations.dart';
 
+import 'package:image/image.dart' as Im;
+import 'package:path_provider/path_provider.dart';
+import 'dart:math' as Math;
+
 class ProfileModelView {
+  static late File compressedImage;
   static final profilModel = ProfilModel();
   static bool isEdit = false;
-
+  static final TextEditingController _controllerBio =
+      new TextEditingController();
   static Widget IdentityZone(
-      {required double height, required BuildContext context}) {
+      {required double height,
+      required double width,
+      required BuildContext context,
+      required Function setstate}) {
     return Container(
         height: height,
         width: double.infinity,
@@ -29,39 +39,54 @@ class ProfileModelView {
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
               Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
                   // resimDownloader(height),
                   Observer(builder: (_) {
-                    return profilAvatar(height, isEdit, context);
+                    print(profilModel.imageUrl);
+                    return profilAvatar(height, isEdit, context, width);
                   }),
                   Container(
-                    width: 250,
+                    width: width * 0.7,
                     height: height * 0.50,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        Text("biografi"),
-                        Text(
-                            "----------------------------------------------------------"),
+                        isEdit ? SizedBox() : Text("biografi"),
+                        isEdit
+                            ? SizedBox()
+                            : Text(
+                                "----------------------------------------------------------"),
                         Padding(
                           padding: EdgeInsets.all(2),
 
                           //newly added
                           child: Container(
-                            padding: EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 15.0),
-                            child: Observer(
-                              builder: (_) {
-                                return FutureBuilder(
-                                    future: profilModel.myBio(),
-                                    builder: (BuildContext context,
-                                        AsyncSnapshot<void> snapshot) {
-                                      return Text(profilModel.bio,
-                                          textAlign: TextAlign.center,
-                                          style: TextStyle(),
-                                          softWrap: true);
-                                    });
-                              },
-                            ),
+                            child: isEdit
+                                ? Container(
+                                    height: height * 0.45,
+                                    width: width * 0.7,
+                                    child: TextField(
+                                      controller: _controllerBio
+                                        ..text = profilModel.bio,
+                                      maxLines: 2,
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(fontSize: 14),
+                                    ),
+                                  )
+                                : Observer(
+                                    builder: (_) {
+                                      return FutureBuilder(
+                                          future: profilModel.myBio(),
+                                          builder: (BuildContext context,
+                                              AsyncSnapshot<void> snapshot) {
+                                            return Text(profilModel.bio,
+                                                textAlign: TextAlign.center,
+                                                style: TextStyle(),
+                                                softWrap: true);
+                                          });
+                                    },
+                                  ),
                           ),
                         )
                       ],
@@ -76,11 +101,17 @@ class ProfileModelView {
               Container(
                 width: double.infinity,
                 child: OutlinedButton(
-                    onPressed: () async {
-                      print(
-                          await DatabaseOperations.getBio(Profile.currentuser));
-                    },
-                    child: Text("profili düzenle")),
+                  onPressed: () async {
+                    if (isEdit) {
+                      await DatabaseOperations.setBio(
+                          Profile.currentuser, _controllerBio.text);
+                      profilModel.myBio();
+                    }
+                    isEdit ? isEdit = false : isEdit = true;
+                    setstate();
+                  },
+                  child: isEdit ? Text("bunu kaydet") : Text("profili düzenle"),
+                ),
               ),
             ],
           ),
@@ -88,6 +119,7 @@ class ProfileModelView {
   }
 
   static Widget profileLinksZone() {
+    ProfileModelView.profilModel.getLinks();
     return Observer(builder: (_) {
       return Container(
           height: (profilModel.links.length * 40) + 50,
@@ -107,9 +139,10 @@ class ProfileModelView {
     });
   }
 
-  static Widget profilAvatar(double height, bool isEdit, BuildContext context) {
+  static Widget profilAvatar(
+      double height, bool isEdit, BuildContext context, double width) {
     return FutureBuilder(
-        future: profilModel.getImage(),
+        future: profilModel.getImage(Profile.currentuser.userDocId),
         builder: (BuildContext context, AsyncSnapshot<void> snapshot) {
           return isEdit
               ? GestureDetector(
@@ -120,27 +153,29 @@ class ProfileModelView {
 
                     if (task == null) return;
 
-                    final snapshot = await task.whenComplete(() {});
-                    profilModel.imageUrl = await snapshot.ref.getDownloadURL();
+                    await task.whenComplete(() async {
+                      await profilModel.getImage(Profile.currentuser.userDocId);
+                      print('burdayım');
+                    });
 
                     print(profilModel.imageUrl);
                   },
                   child: Stack(children: [
                     CircleAvatar(
-                      radius: height * 0.25,
+                      radius: width * 0.12,
                       backgroundColor: Colors.transparent,
                       foregroundImage: NetworkImage(profilModel.imageUrl),
-                      child: Text("foto  seçin"),
+                      child: Text("fotoğraf yükleniyor"),
                     ),
                     CircleAvatar(
-                      radius: height * 0.25,
+                      radius: width * 0.12,
                       backgroundColor: Colors.black45,
                       child: Icon(Icons.add_a_photo),
                     ),
                   ]),
                 )
               : CircleAvatar(
-                  radius: height * 0.25,
+                  radius: width * 0.12,
                   backgroundColor: Colors.transparent,
                   foregroundImage: NetworkImage(profilModel.imageUrl),
                   child: Text("foto  seçin"),
@@ -153,14 +188,29 @@ class ProfileModelView {
         .pickFiles(allowMultiple: false, type: FileType.image);
 
     if (result == null) return File("sdaef");
-    final path = result.files.single.path!;
-    return File(path);
+    final pathOriginal = result.files.single.path!;
+
+    File imageFile = File(pathOriginal);
+    final tempDir = await getTemporaryDirectory();
+    final path = tempDir.path;
+    int rand = new Math.Random().nextInt(10000);
+    Im.Image? image = Im.decodeImage(imageFile.readAsBytesSync());
+    Im.Image smallerImage = Im.copyResize(
+      image!,
+      width: 500,
+    ); // choose the size here, it will maintain aspect ratio
+
+    var compressedImage = new File('$path/img_$rand.jpg')
+      ..writeAsBytesSync(Im.encodeJpg(smallerImage));
+
+    return compressedImage;
   }
 
   static Widget linkItem(LinkModel linkModel) {
     return InkWell(
       onTap: () {
         DatabaseOperations.deleteOneLink(linkModel);
+        profilModel.getLinks();
       },
       child: Container(
           height: 40,

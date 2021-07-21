@@ -4,6 +4,8 @@ import 'package:linker/core/user_model.dart';
 import 'package:linker/services/database/database_operations.dart';
 
 class Auth {
+  static bool isRegister = false;
+
   static CollectionReference users =
       FirebaseFirestore.instance.collection('users');
 
@@ -24,6 +26,10 @@ class Auth {
     } catch (e) {
       return e.toString();
     }
+    DatabaseOperations.createUserBiokDocs(user);
+    DatabaseOperations.createUserLinkDocs(user);
+    DatabaseOperations.createGroupsPath(user);
+
     return 'kayıt başarılı';
   }
 
@@ -46,6 +52,7 @@ class Auth {
       print("böyle bir nick yok");
       return "böyle bir nick yok";
     }
+
     print("giriş başarılı");
     return 'giriş başarılı';
   }

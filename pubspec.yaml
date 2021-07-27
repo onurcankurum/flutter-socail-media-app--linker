@@ -43,6 +43,9 @@ dependencies:
   shared_preferences: ^2.0.6
   image_picker: ^0.8.2
   path_provider: ^2.0.2
+  search_app_bar_page: ^2.0.1
+  connectivity: ^3.0.6
+
 
 
 

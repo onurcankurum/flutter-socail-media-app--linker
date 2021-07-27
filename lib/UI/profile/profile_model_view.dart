@@ -118,7 +118,10 @@ class ProfileModelView {
         ));
   }
 
-  static Widget profileLinksZone() {
+  static Widget profileLinksZone(
+    double width,
+    double height,
+  ) {
     ProfileModelView.profilModel.getLinks();
     return Observer(builder: (_) {
       return Container(
@@ -132,7 +135,22 @@ class ProfileModelView {
                   physics: NeverScrollableScrollPhysics(),
                   itemCount: profilModel.links.length,
                   itemBuilder: (BuildContext context, int index) {
-                    return ProfileModelView.linkItem(profilModel.links[index]);
+                    final LinkModel item = profilModel.links[index];
+                    return Dismissible(
+                      onDismissed: (direction) {
+                        DatabaseOperations.deleteOneLink(item);
+                        profilModel.getLinks();
+                        // Remove the item from the data source.
+
+                        // Then show a snackbar.
+                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                            content: Text(
+                                '${item.platform} platformundan ${item.nick} silindi')));
+                      },
+                      key: Key(item.docId),
+                      child: ProfileModelView.linkItem(
+                          profilModel.links[index], context, width, height),
+                    );
                   }),
             ),
           ]));
@@ -206,11 +224,38 @@ class ProfileModelView {
     return compressedImage;
   }
 
-  static Widget linkItem(LinkModel linkModel) {
+  static Widget linkItem(
+      LinkModel linkModel, BuildContext context, double width, double height) {
     return InkWell(
       onTap: () {
-        DatabaseOperations.deleteOneLink(linkModel);
-        profilModel.getLinks();
+        showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return Dialog(
+                child: new Container(
+                  color: Colors.blue[50],
+                  width: width * 0.5,
+                  height: height * 0.5,
+                  child: Column(
+                    children: [
+                      Row(
+                        children: [Text("platform "), Text(linkModel.platform)],
+                      ),
+                      Row(
+                        children: [
+                          Text("özel kullanıcı adı "),
+                          Text(linkModel.nick)
+                        ],
+                      ),
+                      Text("-----------açıklama-----------"),
+                      Text(linkModel.info),
+                      Text(
+                          "burada da bu erişim etiketlerinden olacak ama sadece kendi profilin için")
+                    ],
+                  ),
+                ),
+              );
+            });
       },
       child: Container(
           height: 40,

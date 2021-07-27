@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:group_button/group_button.dart';
 import 'package:linker/UI/edit_bottom_sheet/bottom_model_view.dart';
-import 'package:linker/UI/home/logi_model_view.dart';
+import 'package:linker/UI/home/home_model_view.dart';
 
 class EditBottomSheet extends StatefulWidget {
   EditBottomSheet({Key? key}) : super(key: key);
@@ -19,26 +19,21 @@ class _EditBottomSheetState extends State<EditBottomSheet> {
       padding: const EdgeInsets.only(right: 8, left: 8, bottom: 8),
       child: Container(
           alignment: Alignment.center,
-          height: deviceSize.height * 0.8,
+          height: deviceSize.height * 0.9,
           width: double.infinity,
           child: Column(children: [
             BottomModelView.platformInputField(),
             BottomModelView.platformNickField(),
-            BottomModelView.layerLister([
-              'aile',
-              'arkadaşlar',
-              'diğer',
-              'bablar',
-              'salaklar',
-              'bebişler'
-                  'aile',
-              'arkadaşlar',
-              'diğer',
-              'bablar',
-              'salaklar',
-              'bebişler',
-            ]),
-            BottomModelView.saveButton(context),
+            BottomModelView.platformInfoField(),
+            BottomModelView.layerLister(),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                BottomModelView.newLayerButton(context),
+                SizedBox(width: 40),
+                BottomModelView.saveButton(context),
+              ],
+            )
           ])),
     );
   }

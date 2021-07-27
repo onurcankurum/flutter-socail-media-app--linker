@@ -76,7 +76,8 @@ class _ProfileState extends State<Profile> {
                       height: deviceSize.height * 0.25,
                       context: context,
                       setstate: yenile),
-                  ProfileModelView.profileLinksZone(),
+                  ProfileModelView.profileLinksZone(
+                      deviceSize.width, deviceSize.height),
                 ],
               ),
             ),

@@ -35,7 +35,7 @@ class Auth {
 
   static Future<String> signIn({required UserModel user}) async {
     try {
-      user.email = await DatabaseOperations.getUser(user.userDocId);
+      user.email = await DatabaseOperations.nickToEmail(user.userDocId);
       UserCredential userCredential = await FirebaseAuth.instance
           .signInWithEmailAndPassword(email: user.email, password: user.pass);
     } on FirebaseAuthException catch (e) {

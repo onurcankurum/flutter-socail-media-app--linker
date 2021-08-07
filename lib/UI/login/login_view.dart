@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:linker/UI/login/login_model_view.dart';
 import 'package:linker/UI/profile/profile_view.dart';
 import 'package:linker/core/user_model.dart';
@@ -68,71 +69,74 @@ class _LoginScreenState extends State<LoginScreen> {
     final deviceSize = MediaQuery.of(context).size;
 
     return Scaffold(
-        backgroundColor: Colors.blue[100],
         body: Padding(
-          padding: const EdgeInsets.all(20.0),
-          child: Container(
-            color: Colors.white,
-            width: double.infinity,
-            height: double.infinity,
-            child: SingleChildScrollView(
-              child: Form(
-                key: LoginModelView.formKey,
-                child: Container(
-                  width: deviceSize.width,
-                  height: deviceSize.height,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Padding(
-                        padding: EdgeInsets.all(40),
-                        child: Image(
-                          image: AssetImage('assets/icon.png'),
-                          color: Colors.deepOrangeAccent,
-                        ),
-                      ),
-                      LoginModelView.nickName(LoginScreen.isRegister),
-                      LoginModelView.password(),
-                      LoginScreen.isRegister
-                          ? LoginModelView.usernameField()
-                          : SizedBox.shrink(),
-                      LoginScreen.isRegister
-                          ? LoginModelView.email()
-                          : SizedBox.shrink(),
-                      ElevatedButton(
-                          onPressed: () async {
-                            if (LoginScreen.isRegister) {
-                              setState(() async {
-                                MyApp.isRegister = true;
-                                await register();
-                              });
-                            } else {
-                              MyApp.isRegister = false;
-                              await FirebaseAuth.instance.signOut();
-                              signIn(context);
-                            }
-                          },
-                          child: LoginScreen.isRegister
-                              ? Text('kayıt olmak')
-                              : Text('giriş yapmak')),
-                      TextButton(
-                          onPressed: () async {
-                            setState(() {
-                              LoginScreen.isRegister
-                                  ? LoginScreen.isRegister = false
-                                  : LoginScreen.isRegister = true;
-                            });
-                          },
-                          child: LoginScreen.isRegister
-                              ? Text('giriş ekranı')
-                              : Text('kayıt ekranı'))
-                    ],
+      padding: EdgeInsets.all(deviceSize.width * 0.05),
+      child: Container(
+        color: Colors.white,
+        width: double.infinity,
+        height: double.infinity,
+        child: SingleChildScrollView(
+          child: Form(
+            key: LoginModelView.formKey,
+            child: Container(
+              width: deviceSize.width,
+              height: deviceSize.height,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Container(
+                    alignment: Alignment.center,
+                    height: deviceSize.height * 0.3,
+                    child: Text(
+                      "Linker",
+                      style: GoogleFonts.jost(
+                          color: Colors.black,
+                          fontSize: deviceSize.height * 0.1,
+                          fontStyle: FontStyle.normal),
+                    ),
                   ),
-                ),
+                  LoginModelView.nickName(LoginScreen.isRegister),
+                  LoginModelView.password(),
+                  LoginScreen.isRegister
+                      ? LoginModelView.usernameField()
+                      : SizedBox.shrink(),
+                  LoginScreen.isRegister
+                      ? LoginModelView.email()
+                      : SizedBox.shrink(),
+                  ElevatedButton(
+                      onPressed: () async {
+                        if (LoginScreen.isRegister) {
+                          setState(() async {
+                            MyApp.isRegister = true;
+                            await register();
+                          });
+                        } else {
+                          MyApp.isRegister = false;
+                          await FirebaseAuth.instance.signOut();
+                          signIn(context);
+                        }
+                      },
+                      child: LoginScreen.isRegister
+                          ? Text('kayıt olmak')
+                          : Text('giriş yapmak')),
+                  TextButton(
+                      onPressed: () async {
+                        setState(() {
+                          LoginScreen.isRegister
+                              ? LoginScreen.isRegister = false
+                              : LoginScreen.isRegister = true;
+                        });
+                      },
+                      child: LoginScreen.isRegister
+                          ? Text('giriş ekranı')
+                          : Text('kayıt ekranı'))
+                ],
               ),
             ),
           ),
-        ));
+        ),
+      ),
+    ));
   }
 }

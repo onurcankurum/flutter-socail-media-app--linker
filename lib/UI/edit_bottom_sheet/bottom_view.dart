@@ -11,7 +11,6 @@ class EditBottomSheet extends StatefulWidget {
 }
 
 class _EditBottomSheetState extends State<EditBottomSheet> {
-  final _formKey = GlobalKey<FormState>();
   @override
   Widget build(BuildContext context) {
     final deviceSize = MediaQuery.of(context).size;

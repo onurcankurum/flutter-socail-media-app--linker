@@ -7,6 +7,8 @@ import 'package:linker/services/database/auth.dart';
 import 'package:linker/services/database/database_operations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../main.dart';
+
 class Profile extends StatefulWidget {
   static final UserModel currentuser =
       UserModel(userDocId: "", email: "bilemem", pass: "pass", name: "name");
@@ -21,8 +23,10 @@ class _ProfileState extends State<Profile> {
 
     String id = "";
     id = (prefs.getString('nick')!);
-    Profile.currentuser.userDocId = id;
-    print(Profile.currentuser.userDocId);
+    MyApp.currentuser.userDocId = id;
+
+    UserModel(userDocId: id, email: "bilemem", pass: "pass", name: "name");
+    print(MyApp.currentuser.userDocId);
   }
 
   void yenile() {
@@ -41,7 +45,7 @@ class _ProfileState extends State<Profile> {
           return Scaffold(
             appBar: AppBar(
                 toolbarHeight: 50,
-                title: Text(Profile.currentuser.userDocId),
+                title: Text(MyApp.currentuser.userDocId),
                 actions: [
                   InkWell(
                     onTap: () async {

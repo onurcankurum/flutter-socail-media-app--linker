@@ -8,6 +8,8 @@ import 'package:linker/core/link_model.dart';
 import 'package:linker/services/database/database_operations.dart';
 import 'package:mobx/mobx.dart';
 
+import '../../main.dart';
+
 part 'profil_model.g.dart';
 
 // This is the class used by rest of your codebase
@@ -20,6 +22,7 @@ abstract class _ProfilModel with Store {
   String bio = "";
   @observable
   List<LinkModel> links = [];
+  String name = "";
   @action
   Future<void> getImage(String id) async {
     imageUrl = await FirebaseStorage.instance
@@ -33,10 +36,16 @@ abstract class _ProfilModel with Store {
   }
 
   Future<void> myBio() async {
-    bio = await DatabaseOperations.getBio(Profile.currentuser);
+    bio = await DatabaseOperations.getBio(MyApp.currentuser);
   }
 
   Future<void> getLinks() async {
-    links = await DatabaseOperations.getLinksFull(Profile.currentuser);
+    links = await DatabaseOperations.getLinksFull(MyApp.currentuser);
+  }
+
+  Future<void> getName() async {
+    name = (await DatabaseOperations.getUser(
+            inputNick: MyApp.currentuser.userDocId))!
+        .name;
   }
 }

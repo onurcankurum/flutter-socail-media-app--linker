@@ -1,12 +1,14 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:group_button/group_button.dart';
 import 'package:linker/UI/profile/profile_model_view.dart';
 import 'package:linker/UI/profile/profile_view.dart';
 import 'package:linker/core/link_model.dart';
 import 'package:linker/services/database/database_operations.dart';
 
+import '../../main.dart';
 import 'bottom_model.dart';
 
 class BottomModelView {
@@ -28,7 +30,7 @@ class BottomModelView {
       return GroupButton(
         isRadio: false,
         spacing: 10,
-        buttons: bottomModel.groups.cast<String>() + ["+"],
+        buttons: bottomModel.groups.cast<String>(),
         borderRadius: BorderRadius.circular(30),
         onSelected: (i, selected) {
           if (selected) {
@@ -57,12 +59,38 @@ class BottomModelView {
             return [
               'instagram',
               "youtube",
-              "e-posta",
+              "email",
               "linkedin",
               "snapchat",
-              "twitter"
+              "twitter",
+              "facebook",
+              "tumblr",
+              "spotify",
+              "whatsapp",
+              "diğer"
             ].map<PopupMenuItem<String>>((String value) {
-              return new PopupMenuItem(child: new Text(value), value: value);
+              if (value == "diğer") {
+                return new PopupMenuItem(
+                    child: Row(children: [
+                      SvgPicture.asset('assets/hastag.svg',
+                          height: 20, semanticsLabel: 'Acme Logo'),
+                      SizedBox(
+                        width: 5,
+                      ),
+                      Text(value)
+                    ]),
+                    value: value);
+              }
+              return new PopupMenuItem(
+                  child: Row(children: [
+                    SvgPicture.asset('assets/${value}.svg',
+                        height: 20, semanticsLabel: 'Acme Logo'),
+                    SizedBox(
+                      width: 5,
+                    ),
+                    Text(value)
+                  ]),
+                  value: value);
             }).toList();
           },
         ),
@@ -85,6 +113,11 @@ class BottomModelView {
     return TextFormField(
       maxLines: 3,
       controller: _controllerInfo,
+      validator: (val) {
+        if (val == "") {
+          return "bu çok kısa oldu";
+        }
+      },
       decoration: InputDecoration(
         labelText: 'açıklama serpiştirme',
       ),
@@ -98,7 +131,7 @@ class BottomModelView {
         onPressed: () async {
           Navigator.pop(context);
           await DatabaseOperations.setNewLink(
-              Profile.currentuser,
+              MyApp.currentuser,
               LinkModel(
                   nick: _controllerNick.text,
                   izinliler: choosenGroups,
@@ -107,6 +140,9 @@ class BottomModelView {
                   info: _controllerInfo.text));
           ProfileModelView.profilModel.getLinks();
           choosenGroups.clear();
+          _controllerInfo.text = "";
+          _controllerNick.text = "";
+          _controllerPlatform.text = "";
         },
         child: Text('kaydet'));
   }
@@ -123,21 +159,29 @@ class BottomModelView {
               context: context,
               builder: (BuildContext context) {
                 return Dialog(
-                  child: new Container(
-                      color: Colors.blue[50],
-                      width: double.infinity,
-                      height: double.infinity,
-                      child: Column(children: [
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Container(
+                  backgroundColor: Colors.transparent,
+                  child: Stack(children: [
+                    Container(
+                        color: Colors.transparent,
+                        width: double.infinity,
+                        height: double.infinity,
+                        child: Column(children: [
+                          Container(
+                            height: 30,
+                            width: double.infinity,
+                            color: Colors.transparent,
+                          ),
+                          Container(
+                            height: 20,
+                            width: double.infinity,
+                            color: Colors.white,
+                          ),
+                          Container(
+                              color: Colors.white,
                               height: 50,
                               alignment: Alignment.center,
-                              decoration: BoxDecoration(
-                                color: Colors.pinkAccent,
-                                borderRadius: BorderRadius.circular(50),
-                              ),
                               child: Container(
+                                  color: Colors.white,
                                   width: double.infinity,
                                   padding: EdgeInsets.only(
                                       left: 10, top: 1, right: 10),
@@ -146,55 +190,79 @@ class BottomModelView {
                                     controller: _controllerNewGroup,
                                     cursorColor: Colors.black,
                                     decoration: InputDecoration(
-                                        border: InputBorder.none,
-                                        suffixIcon: CircleAvatar(
-                                          radius: 40,
-                                          backgroundColor: Colors.redAccent,
+                                        hintText: 'örneğin kankalarım',
+                                        suffixIcon: Container(
                                           child: FlatButton(
                                               onPressed: () {
-                                                listKey.currentState!
-                                                    .insertItem(0,
-                                                        duration:
-                                                            const Duration(
-                                                                milliseconds:
-                                                                    500));
-                                                BottomModelView
-                                                    .bottomModel.groups
-                                                    .insert(
-                                                        0,
-                                                        _controllerNewGroup
-                                                            .text);
+                                                if (_controllerNewGroup.text !=
+                                                    "") {
+                                                  print(
+                                                      "--------------dsfasdfasdf---------");
+                                                  listKey.currentState!
+                                                      .insertItem(0,
+                                                          duration:
+                                                              const Duration(
+                                                                  milliseconds:
+                                                                      500));
+                                                  BottomModelView
+                                                      .bottomModel.groups
+                                                      .insert(
+                                                          0,
+                                                          _controllerNewGroup
+                                                              .text);
 
-                                                DatabaseOperations.updateGroups(
-                                                    Profile.currentuser,
-                                                    BottomModelView
-                                                        .bottomModel.groups);
-                                                BottomModelView.bottomModel
-                                                    .reloadGroups();
+                                                  DatabaseOperations
+                                                      .updateGroups(
+                                                          MyApp.currentuser,
+                                                          BottomModelView
+                                                              .bottomModel
+                                                              .groups);
+                                                  BottomModelView.bottomModel
+                                                      .reloadGroups();
+                                                }
+
+                                                _controllerNewGroup.text = "";
                                               },
                                               child: Expanded(
-                                                child: Text("ekle"),
+                                                child: Text(
+                                                  "ekle",
+                                                  style: TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.w800),
+                                                ),
                                               )),
                                         )),
                                   ))),
-                        ),
-                        Container(
-                          height: 500,
-                          child: AnimatedList(
-                            key: listKey,
-                            initialItemCount:
-                                BottomModelView.bottomModel.groups.length,
-                            itemBuilder:
-                                (BuildContext context, int index, animation) {
-                              return BottomModelView.slideIt(
-                                  context,
-                                  index,
-                                  animation,
-                                  BottomModelView.bottomModel.groups[index]);
-                            },
+                          Container(
+                            color: Colors.white,
+                            height: 500,
+                            child: AnimatedList(
+                              key: listKey,
+                              initialItemCount:
+                                  BottomModelView.bottomModel.groups.length,
+                              itemBuilder:
+                                  (BuildContext context, int index, animation) {
+                                return BottomModelView.slideIt(
+                                    context,
+                                    index,
+                                    animation,
+                                    BottomModelView.bottomModel.groups[index]);
+                              },
+                            ),
                           ),
-                        ),
-                      ])),
+                        ])),
+                    GestureDetector(
+                      onTap: () => Navigator.pop(context),
+                      child: Container(
+                        alignment: Alignment.topRight,
+                        child: SvgPicture.asset('assets/kapat.svg',
+                            color: Colors.red,
+                            height: 50,
+                            width: 50,
+                            semanticsLabel: 'Acme Logo'),
+                      ),
+                    )
+                  ]),
                 );
               });
         },
@@ -234,7 +302,7 @@ class BottomModelView {
 
           await BottomModelView.bottomModel.groups.removeAt(index);
           await DatabaseOperations.updateGroups(
-              Profile.currentuser, BottomModelView.bottomModel.groups);
+              MyApp.currentuser, BottomModelView.bottomModel.groups);
           BottomModelView.bottomModel.reloadGroups();
         },
         backgroundColor: color,

@@ -184,7 +184,8 @@ class LoginModelView {
         LoginModelView.usernameValidateKey.currentState!.validate();
       },
       decoration: InputDecoration(
-          labelText: 'isim ve soyisim', suffixIcon: Icon(Icons.person_outline)),
+        labelText: 'isim ve soyisim',
+      ),
       keyboardType: TextInputType.emailAddress,
       onSaved: (value) {},
     );

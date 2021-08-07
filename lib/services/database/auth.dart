@@ -29,6 +29,8 @@ class Auth {
     DatabaseOperations.createUserBiokDocs(user);
     DatabaseOperations.createUserLinkDocs(user);
     DatabaseOperations.createGroupsPath(user);
+    DatabaseOperations.createUserFollowersAndFollowingkDocs(user);
+    DatabaseOperations.createUserNotificationkDoc(user);
 
     return 'kayıt başarılı';
   }

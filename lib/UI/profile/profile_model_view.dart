@@ -1,5 +1,8 @@
 import 'dart:ffi';
 import 'dart:io';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:google_fonts/google_fonts.dart';
+
 import 'package:image_picker/image_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
@@ -17,7 +20,154 @@ import 'package:image/image.dart' as Im;
 import 'package:path_provider/path_provider.dart';
 import 'dart:math' as Math;
 
+import '../../main.dart';
+
 class ProfileModelView {
+  static final List<String> knowingPlatforms = [
+    'instagram',
+    "youtube",
+    "email",
+    "linkedin",
+    "snapchat",
+    "twitter",
+    "facebook",
+    "tumblr",
+    "spotify",
+    "whatsapp",
+    "diğer"
+  ];
+  static void onTapLink(
+      BuildContext context, double height, double width, LinkModel linkModel) {
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return GestureDetector(
+            onTap: () => Navigator.pop(context),
+            child: Dialog(
+              backgroundColor: Colors.transparent,
+              child: new Container(
+                  color: Colors.transparent,
+                  width: width * 0.5,
+                  height: height * 0.5,
+                  child: Stack(
+                    children: [
+                      Column(
+                        children: [
+                          Container(
+                            width: width * 0.5,
+                            height: height * 0.06,
+                          ),
+                          Container(
+                              color: Colors.white,
+                              width: width,
+                              height: height * 0.44,
+                              child: Column(children: [
+                                SizedBox(
+                                  height: height * 0.07,
+                                ),
+                                Row(
+                                  children: [
+                                    SizedBox(
+                                      width: width * 0.05,
+                                    ),
+                                    Text(
+                                      "platform:",
+                                      style: GoogleFonts.alice(
+                                          fontSize: 20,
+                                          fontStyle: FontStyle.normal,
+                                          fontWeight: FontWeight.w800),
+                                    ),
+                                    SizedBox(
+                                      width: width * 0.03,
+                                    ),
+                                    Text(
+                                      linkModel.platform,
+                                      style: GoogleFonts.alice(
+                                          fontSize: 20,
+                                          fontStyle: FontStyle.normal),
+                                    ),
+                                    SizedBox(
+                                      width: width * 0.01,
+                                    ),
+                                  ],
+                                ),
+                                SizedBox(
+                                  height: height * 0.01,
+                                ),
+                                Row(
+                                  children: [
+                                    SizedBox(
+                                      width: width * 0.05,
+                                    ),
+                                    Text("nick:",
+                                        overflow: TextOverflow.clip,
+                                        style: GoogleFonts.alice(
+                                            fontSize: 20,
+                                            fontStyle: FontStyle.normal,
+                                            fontWeight: FontWeight.w800)),
+                                    SizedBox(
+                                      width: width * 0.03,
+                                    ),
+                                    Text(
+                                      linkModel.nick,
+                                      overflow: TextOverflow.fade,
+                                      style: GoogleFonts.alice(
+                                          fontSize: 20,
+                                          fontStyle: FontStyle.normal),
+                                    ),
+                                    SizedBox(
+                                      width: width * 0.01,
+                                    ),
+                                  ],
+                                ),
+                                SizedBox(
+                                  height: height * 0.01,
+                                ),
+                                Text(
+                                  "açıklama",
+                                  overflow: TextOverflow.clip,
+                                  style: GoogleFonts.alice(
+                                      fontSize: 20,
+                                      fontStyle: FontStyle.normal,
+                                      fontWeight: FontWeight.w800),
+                                ),
+                                Divider(),
+                                Padding(
+                                  padding: EdgeInsets.all(8),
+                                  child: Text(
+                                    linkModel.info,
+                                    textAlign: TextAlign.center,
+                                    style: GoogleFonts.alice(
+                                      fontSize: 18,
+                                      fontStyle: FontStyle.normal,
+                                    ),
+                                  ),
+                                ),
+                              ]))
+                        ],
+                      ),
+                      Container(
+                        alignment: Alignment.topCenter,
+                        child: CircleAvatar(
+                            backgroundColor: Colors.transparent,
+                            radius: height * 0.06,
+                            child: (ProfileModelView.knowingPlatforms
+                                    .contains(linkModel.platform))
+                                ? SvgPicture.asset(
+                                    'assets/${linkModel.platform}.svg',
+                                    height: height * 0.1,
+                                    semanticsLabel: 'Acme Logo')
+                                : SvgPicture.asset('assets/hastag.svg',
+                                    height: height * 0.1,
+                                    semanticsLabel: 'Acme Logo')),
+                      )
+                    ],
+                  )),
+            ),
+          );
+        });
+  }
+
   static late File compressedImage;
   static final profilModel = ProfilModel();
   static bool isEdit = false;
@@ -31,7 +181,7 @@ class ProfileModelView {
     return Container(
         height: height,
         width: double.infinity,
-        color: Colors.amber[50],
+        color: Colors.white,
         child: Padding(
           padding: EdgeInsets.only(top: height * 0.05, left: height * 0.05),
           child: Column(
@@ -52,11 +202,18 @@ class ProfileModelView {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        isEdit ? SizedBox() : Text("biografi"),
                         isEdit
                             ? SizedBox()
                             : Text(
-                                "----------------------------------------------------------"),
+                                "biyografi",
+                                style: GoogleFonts.meriendaOne(
+                                    fontSize: 15, fontStyle: FontStyle.normal),
+                              ),
+                        isEdit
+                            ? SizedBox()
+                            : Divider(
+                                thickness: 2,
+                              ),
                         Padding(
                           padding: EdgeInsets.all(2),
 
@@ -80,10 +237,12 @@ class ProfileModelView {
                                           future: profilModel.myBio(),
                                           builder: (BuildContext context,
                                               AsyncSnapshot<void> snapshot) {
-                                            return Text(profilModel.bio,
-                                                textAlign: TextAlign.center,
-                                                style: TextStyle(),
-                                                softWrap: true);
+                                            return Text(
+                                              profilModel.bio,
+                                              style: GoogleFonts.alice(
+                                                  fontSize: 15,
+                                                  fontStyle: FontStyle.normal),
+                                            );
                                           });
                                     },
                                   ),
@@ -96,7 +255,11 @@ class ProfileModelView {
               ),
               Padding(
                 padding: EdgeInsets.all(height * 0.03),
-                child: Text("Onur Can Kurum"),
+                child: FutureBuilder(
+                    future: profilModel.getName(),
+                    builder: (context, AsyncSnapshot<void> A) {
+                      return Text(profilModel.name);
+                    }),
               ),
               Container(
                 width: double.infinity,
@@ -104,7 +267,7 @@ class ProfileModelView {
                   onPressed: () async {
                     if (isEdit) {
                       await DatabaseOperations.setBio(
-                          Profile.currentuser, _controllerBio.text);
+                          MyApp.currentuser, _controllerBio.text);
                       profilModel.myBio();
                     }
                     isEdit ? isEdit = false : isEdit = true;
@@ -127,7 +290,7 @@ class ProfileModelView {
       return Container(
           height: (profilModel.links.length * 40) + 50,
           width: double.infinity,
-          color: Colors.blue[50],
+          color: Colors.deepOrange[10],
           child: Column(children: [
             Container(
               height: profilModel.links.length * 40,
@@ -137,6 +300,33 @@ class ProfileModelView {
                   itemBuilder: (BuildContext context, int index) {
                     final LinkModel item = profilModel.links[index];
                     return Dismissible(
+                      background: Container(
+                          color: Colors.red,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.only(left: 8.0),
+                                child: Text(
+                                  "sil",
+                                  style: GoogleFonts.aclonica(
+                                      color: Colors.white,
+                                      fontSize: 20,
+                                      fontStyle: FontStyle.normal),
+                                ),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.only(right: 8.0),
+                                child: Text(
+                                  "Sil",
+                                  style: GoogleFonts.aclonica(
+                                      color: Colors.white,
+                                      fontSize: 20,
+                                      fontStyle: FontStyle.normal),
+                                ),
+                              ),
+                            ],
+                          )),
                       onDismissed: (direction) {
                         DatabaseOperations.deleteOneLink(item);
                         profilModel.getLinks();
@@ -160,19 +350,19 @@ class ProfileModelView {
   static Widget profilAvatar(
       double height, bool isEdit, BuildContext context, double width) {
     return FutureBuilder(
-        future: profilModel.getImage(Profile.currentuser.userDocId),
+        future: profilModel.getImage(MyApp.currentuser.userDocId),
         builder: (BuildContext context, AsyncSnapshot<void> snapshot) {
           return isEdit
               ? GestureDetector(
                   onTap: () async {
                     final task = DatabaseOperations.uploadFile(
-                        "users/${Profile.currentuser.userDocId}.png",
+                        "users/${MyApp.currentuser.userDocId}.png",
                         await selectFile());
 
                     if (task == null) return;
 
                     await task.whenComplete(() async {
-                      await profilModel.getImage(Profile.currentuser.userDocId);
+                      await profilModel.getImage(MyApp.currentuser.userDocId);
                       print('burdayım');
                     });
 
@@ -183,7 +373,7 @@ class ProfileModelView {
                       radius: width * 0.12,
                       backgroundColor: Colors.transparent,
                       foregroundImage: NetworkImage(profilModel.imageUrl),
-                      child: Text("fotoğraf yükleniyor"),
+                      child: CircularProgressIndicator(),
                     ),
                     CircleAvatar(
                       radius: width * 0.12,
@@ -193,10 +383,10 @@ class ProfileModelView {
                   ]),
                 )
               : CircleAvatar(
+                  backgroundColor: Colors.cyan[200],
                   radius: width * 0.12,
-                  backgroundColor: Colors.transparent,
                   foregroundImage: NetworkImage(profilModel.imageUrl),
-                  child: Text("foto  seçin"),
+                  child: CircularProgressIndicator(),
                 );
         });
   }
@@ -226,48 +416,88 @@ class ProfileModelView {
 
   static Widget linkItem(
       LinkModel linkModel, BuildContext context, double width, double height) {
-    return InkWell(
-      onTap: () {
-        showDialog(
-            context: context,
-            builder: (BuildContext context) {
-              return Dialog(
-                child: new Container(
-                  color: Colors.blue[50],
-                  width: width * 0.5,
-                  height: height * 0.5,
-                  child: Column(
-                    children: [
-                      Row(
-                        children: [Text("platform "), Text(linkModel.platform)],
-                      ),
-                      Row(
-                        children: [
-                          Text("özel kullanıcı adı "),
-                          Text(linkModel.nick)
-                        ],
-                      ),
-                      Text("-----------açıklama-----------"),
-                      Text(linkModel.info),
-                      Text(
-                          "burada da bu erişim etiketlerinden olacak ama sadece kendi profilin için")
-                    ],
-                  ),
+    String icon = "";
+    if (!knowingPlatforms.contains(linkModel.platform)) {
+      icon = "hastag";
+    } else {
+      icon = linkModel.platform;
+    }
+
+    return Container(
+        height: 40,
+        width: width,
+        child: Row(children: [
+          InkWell(
+            onTap: () => onTapLink(context, height, width, linkModel),
+            child: Container(
+              width: width * 0.9,
+              child: Row(mainAxisAlignment: MainAxisAlignment.start, children: [
+                SizedBox(
+                  width: 5,
                 ),
-              );
-            });
-      },
-      child: Container(
-          height: 40,
-          child:
-              Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
-            Text(linkModel.platform),
-            Text(linkModel.nick),
-            Icon(Icons.help_outlined),
-            Text(linkModel.izinliler.toString()),
-            Icon(Icons.delete),
-          ])),
-    );
+                SvgPicture.asset('assets/${icon}.svg',
+                    height: 20, semanticsLabel: 'Acme Logo'),
+                SizedBox(
+                  width: 5,
+                ),
+                Stack(children: [
+                  Text(linkModel.platform + ":   "),
+                  Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        SizedBox(
+                          width: width * 0.3,
+                        ),
+                        Text(linkModel.nick),
+                      ])
+                ]),
+                Expanded(
+                  child: Container(),
+                ),
+                SizedBox(
+                  width: 10,
+                )
+              ]),
+            ),
+          ),
+          InkWell(
+            onTap: () {
+              showDialog(
+                  context: context,
+                  builder: (context) {
+                    return Dialog(
+                      child: Container(
+                        padding: EdgeInsets.all(height * 0.02),
+                        height: width * 0.5,
+                        width: height * 0.5,
+                        color: Colors.white,
+                        child: Column(
+                          children: [
+                            Text(
+                              "bu linki görebilenler",
+                              style: GoogleFonts.sourceSansPro(
+                                  fontSize: 20, fontWeight: FontWeight.w700),
+                            ),
+                            Divider(
+                              indent: 40,
+                              thickness: 3,
+                              endIndent: 40,
+                            ),
+                            Text(
+                              linkModel.izinliler.toString(),
+                              textAlign: TextAlign.center,
+                              style: GoogleFonts.notoSans(fontSize: 18),
+                            )
+                          ],
+                        ),
+                      ),
+                    );
+                  });
+            },
+            child: SvgPicture.asset('assets/more.svg',
+                height: 20, semanticsLabel: 'Acme Logo'),
+          ),
+        ]));
   }
 
   static Widget floatActionButtonAdd(BuildContext context) {

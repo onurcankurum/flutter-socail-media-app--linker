@@ -1,6 +1,7 @@
-import 'package:linker/UI/profile/profile_view.dart';
 import 'package:linker/services/database/database_operations.dart';
 import 'package:mobx/mobx.dart';
+
+import '../../main.dart';
 //flutter packages pub run build_runner build
 part 'bottom_model.g.dart';
 
@@ -13,6 +14,6 @@ abstract class _BottomModel with Store {
   dynamic groups = [];
   @action
   Future<void> reloadGroups() async {
-    groups = await DatabaseOperations.getAllGroups(Profile.currentuser);
+    groups = await DatabaseOperations.getAllGroups(MyApp.currentuser);
   }
 }

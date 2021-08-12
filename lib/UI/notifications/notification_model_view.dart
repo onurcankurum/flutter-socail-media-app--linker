@@ -16,6 +16,7 @@ class NotificationModelView {
               children: [
                 Text("   "),
                 GestureDetector(
+                  behavior: HitTestBehavior.opaque,
                   onTap: () async {
                     Navigator.pushNamed(context, OthersProfileViews.routeName,
                         arguments: ScreenArguments(
@@ -42,6 +43,7 @@ class NotificationModelView {
             child: Row(mainAxisAlignment: MainAxisAlignment.start, children: [
               Text("  "),
               GestureDetector(
+                behavior: HitTestBehavior.opaque,
                 onTap: () async {
                   Navigator.pushNamed(context, OthersProfileViews.routeName,
                       arguments: ScreenArguments(
@@ -55,6 +57,7 @@ class NotificationModelView {
               ),
               Text(",  "),
               GestureDetector(
+                behavior: HitTestBehavior.opaque,
                 onTap: () async {
                   Navigator.pushNamed(context, OthersProfileViews.routeName,
                       arguments: ScreenArguments(

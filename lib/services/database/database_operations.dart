@@ -120,7 +120,9 @@ class DatabaseOperations {
     await FirebaseFirestore.instance
         .collection('users/${user.userDocId}/profile')
         .doc('bio')
-        .set({"bio": "rgdgdgdg"}).then((value) {
+        .set({
+      "bio": "merhaba millet linker' a giriş yapmış bulunmaktayım"
+    }).then((value) {
       print("link klasörü oluşturuldu");
       return true;
     }).catchError((onError) {
@@ -136,8 +138,10 @@ class DatabaseOperations {
         .collection('users/${user.userDocId}/notifications')
         .doc()
         .set({
+      "date": DateTime.now().toString(),
       "notification": "linker' a hoş geldin",
-      'onToch': "onurvcn"
+      'who': "",
+      'whom': null,
     }).then((value) {
       print("link klasörü oluşturuldu");
       return true;
@@ -151,7 +155,7 @@ class DatabaseOperations {
     await FirebaseFirestore.instance
         .collection('users/${user.userDocId}/following')
         .doc()
-        .set({"nick": "Officiallinker"}).then((value) {
+        .set({"nick": "linker"}).then((value) {
       print("link klasörü oluşturuldu");
       return true;
     }).catchError((onError) {
@@ -162,7 +166,7 @@ class DatabaseOperations {
         .collection('users/${user.userDocId}/followers')
         .doc()
         .set({
-      "nick": "Officiallinker",
+      "nick": "linker",
       "permissions": ["herkes"]
     }).then((value) {
       print("link klasörü oluşturuldu");
@@ -178,7 +182,7 @@ class DatabaseOperations {
         .collection('users/${userModel.userDocId}/topluluklar')
         .doc('groups')
         .set({
-      "groups": ["genel", "özel"]
+      "groups": ["herkes", "özel"]
     }).then((value) {
       print("link klasörü oluşturuldu");
       return true;

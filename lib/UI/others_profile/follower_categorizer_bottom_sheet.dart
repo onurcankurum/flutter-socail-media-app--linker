@@ -70,6 +70,7 @@ class _FollowerCategorizerBottomSheetState
             onPressed: () async {
               await DatabaseOperations.setPermissionMyFollower(
                   widget.userModel, choosenGroups);
+              Navigator.pop(context);
               print(choosenGroups);
             })
       ]),

@@ -32,7 +32,10 @@ abstract class _HomeModel with Store {
     userIds = await DatabaseOperations.getAllFollowing(me: MyApp.currentuser);
 
     await DatabaseOperations.getUsers(inputNicks: userIds).then((val) async {
-      await Future.delayed(Duration(seconds: 2));
+      await Future.delayed(Duration(seconds: 1));
+      val.sort((a, b) {
+        return a.userDocId.toLowerCase().compareTo(b.userDocId.toLowerCase());
+      });
       usermodelRelease = val;
     });
     print(usermodelRelease.toString());

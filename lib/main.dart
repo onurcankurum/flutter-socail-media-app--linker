@@ -5,13 +5,19 @@ import 'package:flutter/material.dart';
 import 'package:linker/UI/login/login_view.dart';
 import 'package:linker/UI/others_profile/others_profile_views.dart';
 import 'package:linker/services/database/database_operations.dart';
+import 'package:linker/services/database/lang_services/lang_packs/LanguageTR.dart';
+import 'package:linker/services/database/lang_services/lang_packs/languages.dart';
+import 'package:linker/services/database/lang_services/lang_packs/languagesEn.dart';
+import 'package:linker/services/database/lang_services/languages.dart';
 
 import 'UI/home/home_model_view.dart';
 import 'UI/home/home_view.dart';
 import 'UI/notifications/notification_view.dart';
 import 'UI/profile/profile_view.dart';
 import 'core/user_model.dart';
+import 'services/database/lang_services/language_constants.dart';
 import 'services/database/auth.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 
 void main() async {
 /*   WidgetsFlutterBinding.ensureInitialized();
@@ -20,16 +26,55 @@ void main() async {
   runApp(MyApp());
 }
 
-class MyApp extends StatelessWidget {
-  static final _functions = FirebaseFunctions.instance;
+class MyApp extends StatefulWidget {
+  static late Languages lang;
   static bool isRegister = false;
+
+  static final _functions = FirebaseFunctions.instance;
+
   static UserModel currentuser =
       UserModel(userDocId: "", email: "bilemem", pass: "pass", name: "name");
-  // This widget is the root of your application.
+  static void setLocale(BuildContext context, Locale newLocale) {
+    _MyAppState? state = context.findAncestorStateOfType<_MyAppState>();
+    state!.setLocale(newLocale);
+  }
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  Locale _locale = Locale("tr", "TR");
+  setLocale(Locale locale) {
+    setState(() {
+      _locale = locale;
+    });
+  }
+
+  @override
+  void didChangeDependencies() async {
+    getLocale().then((locale) {
+      setState(() {
+        _locale = locale;
+      });
+    });
+    super.didChangeDependencies();
+  }
+
   @override
   Widget build(BuildContext context) {
+    switch (_locale.languageCode) {
+      case 'tr':
+        MyApp.lang = LanguageTR();
+        break;
+      case 'en':
+        MyApp.lang = LanguageEn();
+        break;
+      default:
+        MyApp.lang = LanguageTR();
+    }
+
     final Future<FirebaseApp> _initialization = Firebase.initializeApp();
-    //FirebaseFunctions.instance.useFunctionsEmulator('localhost', 5001);
     return FutureBuilder(
         future: _initialization,
         builder: (context, appSnapshot) {
@@ -47,6 +92,26 @@ class MyApp extends StatelessWidget {
                 // is not restarted.
                 primarySwatch: Colors.blue,
                 primaryColor: Colors.deepPurpleAccent),
+            supportedLocales: [
+              Locale("en", "US"),
+              Locale("tr", "TR"),
+            ],
+            localeResolutionCallback: (locale, supportedLocales) {
+              print("--------a" + locale!.languageCode);
+              for (var supportedLocale in supportedLocales) {
+                if (supportedLocale.languageCode == locale!.languageCode &&
+                    supportedLocale.countryCode == locale.countryCode) {
+                  return supportedLocale;
+                }
+              }
+              return supportedLocales.first;
+            },
+            localizationsDelegates: [
+              //DemoLocalization.delegate,
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+            ],
             home: appSnapshot.connectionState != ConnectionState.done
                 ? CircularProgressIndicator()
                 : StreamBuilder(
@@ -57,11 +122,9 @@ class MyApp extends StatelessWidget {
                         return CircularProgressIndicator();
                       }
                       if (userSnapshot.hasData) {
-                        print("alş");
-                        print(isRegister);
-                        if (isRegister) {
-                          isRegister = false;
-                          print("alş");
+                        if (MyApp.isRegister) {
+                          MyApp.isRegister = false;
+
                           return LoginScreen();
                         }
 

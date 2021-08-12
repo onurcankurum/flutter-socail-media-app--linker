@@ -67,7 +67,13 @@ class _ProfileState extends State<Profile> {
                       ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(content: Text('çıkış başarılı'))); */
                     },
-                    child: Icon(Icons.logout_outlined, color: Colors.red[400]),
+                    child: Padding(
+                      padding: const EdgeInsets.only(right: 8.0),
+                      child: Icon(
+                        Icons.logout_outlined,
+                        color: Colors.red[400],
+                      ),
+                    ),
                   ),
                 ]),
             floatingActionButton:

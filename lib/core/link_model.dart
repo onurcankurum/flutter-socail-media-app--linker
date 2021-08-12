@@ -1,11 +1,11 @@
 import 'dart:io';
 
 class LinkModel {
-  late String nick;
-  late List<String> izinliler;
-  late String platform;
-  late String docId;
-  late String info;
+  String nick;
+  List<String> izinliler;
+  String platform;
+  String docId;
+  String info;
 
   LinkModel(
       {required this.nick,

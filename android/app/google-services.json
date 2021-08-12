@@ -9,7 +9,7 @@
       "client_info": {
         "mobilesdk_app_id": "1:475338950129:android:b436bd87d1f9b4c36c7050",
         "android_client_info": {
-          "package_name": "com.example.linker"
+          "package_name": "com.linkerCardvisite.linker"
         }
       },
       "oauth_client": [
@@ -38,7 +38,7 @@
       "client_info": {
         "mobilesdk_app_id": "1:475338950129:android:7340cc16b89b2ce26c7050",
         "android_client_info": {
-          "package_name": "com.example.linker_alpha"
+          "package_name": "com.linkerCardvisite.linker_alpha"
         }
       },
       "oauth_client": [

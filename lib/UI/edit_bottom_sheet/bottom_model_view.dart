@@ -61,6 +61,7 @@ class BottomModelView {
               "youtube",
               "email",
               "linkedin",
+              "linker",
               "snapchat",
               "twitter",
               "facebook",
@@ -74,6 +75,21 @@ class BottomModelView {
                     child: Row(children: [
                       SvgPicture.asset('assets/hastag.svg',
                           height: 20, semanticsLabel: 'Acme Logo'),
+                      SizedBox(
+                        width: 5,
+                      ),
+                      Text(value)
+                    ]),
+                    value: value);
+              }
+              if (value == "linker") {
+                return new PopupMenuItem(
+                    child: Row(children: [
+                      Image.asset(
+                        'assets/linker.png',
+                        color: Colors.black,
+                        height: 20,
+                      ),
                       SizedBox(
                         width: 5,
                       ),

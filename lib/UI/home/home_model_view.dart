@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:linker/UI/home/home_model.dart';
 import 'package:linker/UI/home/home_view.dart';
 import 'package:linker/UI/notifications/notification_view.dart';
@@ -88,7 +89,7 @@ class HomeModelView {
                     _searchbarCloseAnime(setsttate);
                   },
                   child: Icon(Icons.arrow_back))
-              : Icon(Icons.menu),
+              : null,
           title: isSearch
               ? TextFormField(
                   controller: HomeModelView.myController,
@@ -103,10 +104,19 @@ class HomeModelView {
                   cursorHeight: appBarheight * 0.45,
                   autofocus: true,
                   decoration: InputDecoration(
-                    hintText: 'kullanıcı adı girin',
+                    hintText: MyApp.lang.typeNickName,
                     hintStyle: TextStyle(color: Colors.blueGrey[300]),
                   ))
-              : Container(alignment: Alignment.topRight, child: Text("Linker")),
+              : Container(
+                  alignment: Alignment.center,
+                  child: Text(
+                    "Linker",
+                    style: GoogleFonts.jost(
+                        color: Colors.white,
+                        fontSize: 27,
+                        fontStyle: FontStyle.normal),
+                  ),
+                ),
           actions: [
             GestureDetector(
               onTap: () {
@@ -116,7 +126,9 @@ class HomeModelView {
                   _searchbarOpenAnime(setsttate);
                 }
               },
-              child: Icon(Icons.search),
+              child: Padding(
+                  padding: const EdgeInsets.only(right: 8.0),
+                  child: Icon(Icons.search)),
             )
           ],
         ),
@@ -174,6 +186,7 @@ class HomeModelView {
             AsyncSnapshot<UserModel?> snapshotUserModel) {
           if (snapshotUserModel.hasData) {
             return GestureDetector(
+              behavior: HitTestBehavior.opaque,
               onTap: () {
                 print(userDocId + "  " + MyApp.currentuser.userDocId);
                 if (userDocId == MyApp.currentuser.userDocId) {
@@ -198,11 +211,27 @@ class HomeModelView {
                                   AsyncSnapshot<String> snapshotImageUrl) {
                                 if (snapshotImageUrl.hasData) {
                                   return CircleAvatar(
-                                    foregroundImage:
-                                        NetworkImage(snapshotImageUrl.data!),
+                                    child: CachedNetworkImage(
+                                      imageUrl: snapshotImageUrl.data!,
+                                      placeholder: (context, url) =>
+                                          CircularProgressIndicator(),
+                                      errorWidget: (context, url, error) =>
+                                          Icon(Icons.error),
+                                      imageBuilder: (context, imageProvider) =>
+                                          Container(
+                                        decoration: BoxDecoration(
+                                          shape: BoxShape.circle,
+                                          image: DecorationImage(
+                                              image: imageProvider,
+                                              fit: BoxFit.cover),
+                                        ),
+                                      ),
+                                    ),
                                   );
                                 } else {
-                                  return Text("image not found");
+                                  return CircleAvatar(
+                                    child: CircularProgressIndicator(),
+                                  );
                                 }
                               }),
                           SizedBox(
@@ -260,13 +289,28 @@ class HomeModelView {
                   future: DatabaseOperations.getImage(userModel.userDocId),
                   builder: (context, AsyncSnapshot<String> imageurl) {
                     if (imageurl.hasData) {
-                      return Container(
-                        width: 80.0,
-                        height: 80.0,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          image: DecorationImage(
-                            image: CachedNetworkImageProvider(imageurl.data!),
+                      return Padding(
+                        padding: const EdgeInsets.only(left: 6.0, right: 10),
+                        child: CircleAvatar(
+                          radius: 25,
+                          child: CachedNetworkImage(
+                            imageUrl: imageurl.data!,
+                            placeholder: (context, url) =>
+                                CircularProgressIndicator(),
+                            errorWidget: (context, url, error) => Container(
+                                decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              image: DecorationImage(
+                                  image: AssetImage('assets/noImage.jpg'),
+                                  fit: BoxFit.cover),
+                            )),
+                            imageBuilder: (context, imageProvider) => Container(
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                image: DecorationImage(
+                                    image: imageProvider, fit: BoxFit.cover),
+                              ),
+                            ),
                           ),
                         ),
                       );
@@ -281,11 +325,11 @@ class HomeModelView {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      userModel.name,
+                      userModel.userDocId,
                       style: TextStyle(fontWeight: FontWeight.w800),
                     ),
                     Text(
-                      userModel.userDocId,
+                      userModel.name,
                       overflow: TextOverflow.fade,
                     )
                   ]),

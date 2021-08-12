@@ -1,6 +1,8 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -15,6 +17,7 @@ import 'package:linker/core/notification_model.dart';
 import 'package:linker/core/user_model.dart';
 import 'package:linker/main.dart';
 import 'package:linker/services/database/database_operations.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class otherProfileModelView {
   static bool isbuttonBusy = false;
@@ -63,10 +66,14 @@ class otherProfileModelView {
                                   future: DatabaseOperations.getBio(userModel),
                                   builder: (BuildContext context,
                                       AsyncSnapshot<String> snapshot) {
-                                    return Text(snapshot.data!,
-                                        textAlign: TextAlign.center,
-                                        style: TextStyle(),
-                                        softWrap: true);
+                                    if (snapshot.hasData) {
+                                      return Text(snapshot.data!,
+                                          textAlign: TextAlign.center,
+                                          style: TextStyle(),
+                                          softWrap: true);
+                                    } else {
+                                      return Container();
+                                    }
                                   })),
                         )
                       ],
@@ -96,7 +103,7 @@ class otherProfileModelView {
                                   setstate();
                                   HomeModelView.homeModel.updateUsers();
                                 },
-                                child: Text("takipten çık"),
+                                child: Text("${MyApp.lang.unfollow}"),
                               );
                             } else {
                               return OutlinedButton(
@@ -110,9 +117,8 @@ class otherProfileModelView {
                                       "token": await DatabaseOperations.getFcm(
                                           userModel.userDocId),
                                       "title":
-                                          "${MyApp.currentuser.userDocId} seni takip etmeye başladı",
-                                      "body":
-                                          "özel bir gruba eklemek için dokun"
+                                          "${MyApp.currentuser.userDocId} ${MyApp.lang.startedFollowU}",
+                                      "body": "${MyApp.lang.addSpecialGroup}"
                                     }
                                   }).then((val) async {
                                     setstate();
@@ -123,10 +129,11 @@ class otherProfileModelView {
                                       DatabaseOperations.setNewNotification(
                                           userModel.userDocId,
                                           NotificationModel(
+                                            date: DateTime.now().toString(),
                                             who:
                                                 "${MyApp.currentuser.userDocId}",
                                             notification:
-                                                "seni takip etmeye başladı",
+                                                "${MyApp.lang.startedFollowU}",
                                           ));
                                       setstate;
                                       DatabaseOperations.getAllFollowers(
@@ -136,11 +143,12 @@ class otherProfileModelView {
                                           DatabaseOperations.setNewNotification(
                                               element,
                                               NotificationModel(
+                                                date: DateTime.now().toString(),
                                                 who:
-                                                    " ${MyApp.currentuser.userDocId}",
+                                                    "${MyApp.currentuser.userDocId}",
                                                 whom: "${userModel.userDocId}",
                                                 notification:
-                                                    "takip etmeye başladı",
+                                                    "${MyApp.lang.someOneFollowSomeone}",
                                               ));
                                           await DatabaseOperations.getFcm(
                                               element);
@@ -151,8 +159,10 @@ class otherProfileModelView {
                                                   "token":
                                                       await DatabaseOperations
                                                           .getFcm(element),
-                                                  "title":
-                                                      "takip ettiğin ${MyApp.currentuser.userDocId}, ${userModel.userDocId}' ı takip etmeye başladı",
+                                                  "title": MyApp.lang.follow ==
+                                                          "follow"
+                                                      ? "${MyApp.lang.someOneFollowSomeone} ${MyApp.currentuser.userDocId}, ${userModel.userDocId}"
+                                                      : "${MyApp.currentuser.userDocId}, ${userModel.userDocId}'${MyApp.lang.someOneFollowSomeone}",
                                                   "body":
                                                       "bildirimleri görmek için tıkla"
                                                 }
@@ -170,7 +180,7 @@ class otherProfileModelView {
                                     });
                                   });
                                 },
-                                child: Text("takip et"),
+                                child: Text("${MyApp.lang.follow}"),
                               );
                             }
                           } else {
@@ -200,12 +210,12 @@ class otherProfileModelView {
                                             userModel: userModel);
                                       });
                                 },
-                                child: Text("kategoriye ekle"),
+                                child: Text("${MyApp.lang.addCat}"),
                               );
                             } else {
                               return OutlinedButton(
                                 onPressed: null,
-                                child: Text("seni takip etmiyor"),
+                                child: Text("${MyApp.lang.doesNotFollowU}"),
                               );
                             }
                           } else {
@@ -230,9 +240,24 @@ class otherProfileModelView {
           if (snapshot.hasData) {
             return CircleAvatar(
               radius: width * 0.12,
-              backgroundColor: Colors.transparent,
-              foregroundImage: NetworkImage(snapshot.data!),
-              child: Text("foto  seçin"),
+              child: CachedNetworkImage(
+                imageUrl: snapshot.data!,
+                placeholder: (context, url) => CircularProgressIndicator(),
+                errorWidget: (context, url, error) => Container(
+                    decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  image: DecorationImage(
+                      image: AssetImage('assets/noImage.jpg'),
+                      fit: BoxFit.cover),
+                )),
+                imageBuilder: (context, imageProvider) => Container(
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    image: DecorationImage(
+                        image: imageProvider, fit: BoxFit.cover),
+                  ),
+                ),
+              ),
             );
           } else {
             return CircleAvatar(
@@ -267,8 +292,12 @@ class otherProfileModelView {
                         itemCount: snapshot.data!.length,
                         itemBuilder: (BuildContext context, int index) {
                           final LinkModel item = snapshot.data![index];
-                          return otherProfileModelView.linkItem(
-                              snapshot.data![index], context, width, height);
+                          return Padding(
+                            padding:
+                                const EdgeInsets.only(left: 10.0, right: 10),
+                            child: otherProfileModelView.linkItem(
+                                snapshot.data![index], context, width, height),
+                          );
                         }),
                   ),
                 ]));
@@ -352,6 +381,7 @@ class otherProfileModelView {
                                         ),
                                         Text("nick:",
                                             overflow: TextOverflow.clip,
+                                            maxLines: 2,
                                             style: GoogleFonts.alice(
                                                 fontSize: 20,
                                                 fontStyle: FontStyle.normal,
@@ -359,12 +389,40 @@ class otherProfileModelView {
                                         SizedBox(
                                           width: width * 0.03,
                                         ),
-                                        Text(
-                                          linkModel.nick,
-                                          overflow: TextOverflow.fade,
-                                          style: GoogleFonts.alice(
-                                              fontSize: 20,
-                                              fontStyle: FontStyle.normal),
+                                        Container(
+                                          width: width * 0.41,
+                                          child: InkWell(
+                                            onTap: () async {
+                                              final url = linkModel.nick;
+                                              if (await canLaunch(url)) {
+                                                await launch(
+                                                  url,
+                                                  forceSafariVC: true,
+                                                );
+                                              }
+                                              if (await canLaunch(
+                                                  "https://www." +
+                                                      linkModel.platform +
+                                                      ".com/" +
+                                                      url)) {
+                                                await launch(
+                                                  "https://www." +
+                                                      linkModel.platform +
+                                                      ".com/" +
+                                                      url,
+                                                  forceSafariVC: true,
+                                                );
+                                              }
+                                            },
+                                            child: Text(
+                                              linkModel.nick,
+                                              maxLines: 2,
+                                              overflow: TextOverflow.fade,
+                                              style: GoogleFonts.alice(
+                                                  fontSize: 20,
+                                                  fontStyle: FontStyle.normal),
+                                            ),
+                                          ),
                                         ),
                                         SizedBox(
                                           width: width * 0.01,
@@ -375,7 +433,7 @@ class otherProfileModelView {
                                       height: height * 0.01,
                                     ),
                                     Text(
-                                      "açıklama",
+                                      "${MyApp.lang.info}",
                                       overflow: TextOverflow.clip,
                                       style: GoogleFonts.alice(
                                           fontSize: 20,
@@ -418,6 +476,13 @@ class otherProfileModelView {
             });
       },
       child: Container(
+          decoration: BoxDecoration(
+              border: Border(
+            top: BorderSide.none,
+            right: BorderSide.none,
+            bottom: BorderSide(color: Colors.black),
+            left: BorderSide(color: Colors.black),
+          )),
           height: 40,
           width: width,
           child: Row(mainAxisAlignment: MainAxisAlignment.start, children: [
@@ -435,7 +500,13 @@ class otherProfileModelView {
                 SizedBox(
                   width: width * 0.3,
                 ),
-                Text(linkModel.nick),
+                Container(
+                  width: width * 0.41,
+                  child: Text(
+                    linkModel.nick,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
               ])
             ]),
             Expanded(

@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:linker/core/user_model.dart';
+import 'package:linker/main.dart';
 import 'package:linker/services/database/database_operations.dart';
 
 class Auth {
@@ -19,9 +20,9 @@ class Auth {
       error = 'kayıt Başarılı';
     } on FirebaseAuthException catch (e) {
       if (e.code == 'weak-password') {
-        return 'parola çok zayıf ';
+        return MyApp.lang.weakPassword;
       } else if (e.code == 'email-already-in-use') {
-        return 'bu hesap zaten mevcut';
+        return MyApp.lang.emailAlreadyInUser;
       }
     } catch (e) {
       return e.toString();
@@ -32,7 +33,7 @@ class Auth {
     DatabaseOperations.createUserFollowersAndFollowingkDocs(user);
     DatabaseOperations.createUserNotificationkDoc(user);
 
-    return 'kayıt başarılı';
+    return MyApp.lang.succesfullRegister;
   }
 
   static Future<String> signIn({required UserModel user}) async {
@@ -43,19 +44,19 @@ class Auth {
     } on FirebaseAuthException catch (e) {
       if (e.code == 'user-not-found') {
         print('No user found for that email.');
-        return ('bu mail bulunamadı');
+        return MyApp.lang.noUserFoundForThatMail;
       } else if (e.code == 'wrong-password') {
         print('parola yanlış');
-        return 'parola yanlış';
+        return MyApp.lang.wrongPassword;
       } else {
-        return 'birşeyler ters gitt';
+        return MyApp.lang.somethingWentWrong;
       }
     } catch (e) {
       print("böyle bir nick yok");
-      return "böyle bir nick yok";
+      return MyApp.lang.thisNickDoesntExist;
     }
 
     print("giriş başarılı");
-    return 'giriş başarılı';
+    return MyApp.lang.succesfullLogin;
   }
 }

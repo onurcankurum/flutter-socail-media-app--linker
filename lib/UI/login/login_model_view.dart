@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:linker/UI/login/login_model.dart';
+import 'package:linker/main.dart';
 
 class LoginModelView {
   static Map<String, String> _authData = {
@@ -54,6 +55,7 @@ class LoginModelView {
       }
 
       return TextFormField(
+        keyboardType: TextInputType.visiblePassword,
         controller: nickController,
         key: nickValidateKey,
         onChanged: (str) {
@@ -62,21 +64,25 @@ class LoginModelView {
               : loginS.nickstatus = nickStatus.nothing;
         },
         validator: (value) {
+          if (!RegExp(r"^([a-z]+-{0,1})+([a-z]+)+$")
+              .hasMatch(value.toString())) {
+            return MyApp.lang.nickName +
+                " büyük harf içermemeli (Uppercase error)";
+          }
           if (!RegExp(r'^(?!.*\.\.)(?!.*\.$)[^\W][\w.]{0,29}$')
               .hasMatch(value.toString())) {
             return 'türkçe harf ve özel karakter içermemeli';
           } else if (loginS.nickstatus == nickStatus.unavailable) {
-            return 'bu nick başkasına ait';
+            return MyApp.lang.thisNickBelgsSomeOneElse;
           }
         },
         decoration: InputDecoration(
-            labelText: 'kullanıcı adı',
+            labelText: MyApp.lang.nick,
             suffixIcon: SizedBox(
               child: last,
               width: 10,
               height: 10,
             )),
-        keyboardType: TextInputType.emailAddress,
         onSaved: (value) {},
       );
     });
@@ -98,7 +104,7 @@ class LoginModelView {
         validator: (value) {
           if (!RegExp(r'^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$')
               .hasMatch(value.toString())) {
-            return 'en az sekiz karakter ve en az bir büyük bir, küçük ve bir rakam';
+            return MyApp.lang.passwordRules;
           }
         },
         onChanged: (str) {
@@ -107,7 +113,7 @@ class LoginModelView {
           loginS.passwordCheck(str);
         },
         decoration: InputDecoration(
-            labelText: 'şifre',
+            labelText: MyApp.lang.password,
             suffixIcon: GestureDetector(
                 onTap: () {
                   print(loginS.showHide);
@@ -118,7 +124,7 @@ class LoginModelView {
                   }
                 },
                 child: showHideIcon)),
-        keyboardType: TextInputType.emailAddress,
+        keyboardType: TextInputType.visiblePassword,
         onSaved: (value) {},
       );
     });
@@ -155,14 +161,14 @@ class LoginModelView {
         validator: (value) {
           if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')
               .hasMatch(value.toString())) {
-            return 'şimdilik geçersiz';
+            return MyApp.lang.invalidForNow;
           }
         },
         onChanged: (str) {
           loginS.emailCheck(str);
         },
         decoration: InputDecoration(
-            labelText: 'e-posta', suffixIcon: emailStatusWidget),
+            labelText: MyApp.lang.e_mail, suffixIcon: emailStatusWidget),
         keyboardType: TextInputType.emailAddress,
         onSaved: (value) {},
       );
@@ -177,16 +183,16 @@ class LoginModelView {
         if (!RegExp(
                 r'^[A-Za-zÁČĎÉĚÍŇÓŘŠŤÚŮÝŽáčďéěíňóřšťúůýžÅÆÉØåæéøÉËÏÓÖÜéëïóöüÄÅÖäåöÀÂÆÇÉÈÊËÏÎÔŒÙÛÜŸàâæçéèêëïîôœùûüÿÄÖÜẞäöüßÁÉÍÖÓŐÜÚŰáéíöóőüúűÁÆÐÉÍÓÖÞÚÝáæðéíóöþúýÀÈÉÌÒÓÙàèéìòóùÅÆÂÉÈÊØÓÒÔåæâéèêøóòôĄĆĘŁŃÓŚŹŻąćęłńóśźżÃÁÀÂÇÉÊÍÕÓÔÚÜãáàâçéêíõóôúüĂÂÎŞȘŢȚăâîşșţțÁÉÍÑÓÚÜáéíñóúüÄÅÉÖäåéöÂÇĞIİÎÖŞÜÛâçğıİîöşüû]+(?: [A-Za-zÁČĎÉĚÍŇÓŘŠŤÚŮÝŽáčďéěíňóřšťúůýžÅÆÉØåæéøÉËÏÓÖÜéëïóöüÄÅÖäåöÀÂÆÇÉÈÊËÏÎÔŒÙÛÜŸàâæçéèêëïîôœùûüÿÄÖÜẞäöüßÁÉÍÖÓŐÜÚŰáéíöóőüúűÁÆÐÉÍÓÖÞÚÝáæðéíóöþúýÀÈÉÌÒÓÙàèéìòóùÅÆÂÉÈÊØÓÒÔåæâéèêøóòôĄĆĘŁŃÓŚŹŻąćęłńóśźżÃÁÀÂÇÉÊÍÕÓÔÚÜãáàâçéêíõóôúüĂÂÎŞȘŢȚăâîşșţțÁÉÍÑÓÚÜáéíñóúüÄÅÉÖäåéöÂÇĞIİÎÖŞÜÛâçğıİîöşüû]+)*$')
             .hasMatch(value.toString())) {
-          return 'bu isim sayılmaz';
+          return MyApp.lang.thisNameNotRealName;
         }
       },
       onChanged: (str) {
         LoginModelView.usernameValidateKey.currentState!.validate();
       },
       decoration: InputDecoration(
-        labelText: 'isim ve soyisim',
+        labelText: MyApp.lang.personalName,
       ),
-      keyboardType: TextInputType.emailAddress,
+      keyboardType: TextInputType.name,
       onSaved: (value) {},
     );
   }

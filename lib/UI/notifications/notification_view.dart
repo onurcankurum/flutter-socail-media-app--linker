@@ -16,9 +16,11 @@ class NotificationView extends StatefulWidget {
 class _NotificationViewState extends State<NotificationView> {
   @override
   Widget build(BuildContext context) {
+    NotificationView.items.sort((a, b) => a.date.compareTo(b.date));
+
     return Scaffold(
         appBar: AppBar(
-          title: Text("bildirimler"),
+          title: Text(MyApp.lang.notifications),
         ),
         body: Padding(
           padding: const EdgeInsets.only(top: 8.0),
@@ -29,6 +31,8 @@ class _NotificationViewState extends State<NotificationView> {
                 NotificationView.items =
                     (await DatabaseOperations.getNotifications(
                         MyApp.currentuser));
+                NotificationView.items.sort((a, b) => a.date.compareTo(b.date));
+
                 setState(() {});
               },
               child: ListView.builder(
@@ -37,7 +41,9 @@ class _NotificationViewState extends State<NotificationView> {
                   itemCount: NotificationView.items.length,
                   itemBuilder: (context, i) {
                     return NotificationModelView.item(
-                        NotificationView.items[i], context);
+                        NotificationView
+                            .items[NotificationView.items.length - i - 1],
+                        context);
                     //do something
                   })),
         ));

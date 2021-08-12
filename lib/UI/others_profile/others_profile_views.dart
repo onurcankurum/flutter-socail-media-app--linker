@@ -26,7 +26,9 @@ class _OthersProfileViewsState extends State<OthersProfileViews> {
     final deviceSize = MediaQuery.of(context).size;
 
     return Scaffold(
-        appBar: AppBar(),
+        appBar: AppBar(
+          title: Text(args.userModel.userDocId),
+        ),
         body: Column(
           children: [
             otherProfileModelView.IdentityZone(
